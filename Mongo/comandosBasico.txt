@@ -1,0 +1,21 @@
+// Mostra todos os bancos de dados disponíveis
+show dbs
+
+// Você pode usar este comando para selecionar um banco de dados que ainda não foi criado e ele será criado automaticamente
+use wm
+
+// Criando uma coleção com o nome 'estados'. Após a criação do banco, você pode usar 'show collections' para listar as coleções criadas.
+db.createCollection('estados')
+
+// Mostra todas as coleções criadas
+show collections
+
+// É aceitável usar o mesmo nome com letras maiúsculas, pois o MongoDB é sensível a maiúsculas e minúsculas
+db.createCollection('Estados')
+
+// Vai excluir essa coleção
+db.Estados.drop()
+
+// Lembre-se de que, uma vez que todas as coleções do banco forem excluídas, 'show dbs' não mostrará mais o banco, mas ele ainda estará em uso.
+
+
