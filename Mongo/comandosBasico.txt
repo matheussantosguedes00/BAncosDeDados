@@ -18,4 +18,60 @@ db.Estados.drop()
 
 // Lembre-se de que, uma vez que todas as coleções do banco forem excluídas, 'show dbs' não mostrará mais o banco, mas ele ainda estará em uso.
 
+// Inserir Dados
+db.estados.insert({ nome: "Acre", sigla: "AC", regiao: "Norte" })
 
+// A resposta do banco deve ser "WriteResult({"nInserted" : 1})" indicando sucesso.
+
+// O comando 'save' é utilizado para atualizar ou salvar um documento existente.
+db.estados.save({ nome: "Alagoas", sigla: "AL", regiao: "Nordeste", populacao: 3322000 })
+
+// Para visualizar os dados inseridos, você pode usar 'find'.
+db.estados.find()
+
+// Você também pode usar o comando 'pretty' para visualizar os dados em formato JSON legível.
+db.estados.find().pretty()
+
+// Também é possível adicionar informações sobre cidades dentro de estados.
+db.estados.insert({
+    nome: "Rio de Janeiro",
+    sigla: "RJ",
+    regiao: "Sudeste",
+    cidade: [
+        {
+            nome: "Niterói",
+            area: 133.9,
+            populacao: 487562
+        }
+    ]
+})
+
+// O comando 'help' mostra as operações disponíveis no MongoDB.
+db.help()
+
+// Desafio: adicionar informações sobre São Paulo, incluindo cidades.
+db.estados.insert({
+    nome: "São Paulo",
+    sigla: "SP",
+    regiao: "Sudeste",
+    cidades: [
+        {
+            _id: ObjectId(), // Gere um novo ID ObjectId para a primeira cidade
+            nome: "Campinas",
+            area: 795.7,
+            prefeito: "Jonas Donizette",
+            populacao: 1081000
+        },
+        {
+            _id: ObjectId(), // Gere um novo ID ObjectId para a segunda cidade
+            nome: "Guarulhos",
+            populacao: 1325000
+        },
+        {
+            _id: ObjectId(), // Gere um novo ID ObjectId para a terceira cidade
+            nome: "Sorocaba",
+            distanciaCapital: 87,
+            populacao: 644919
+        }
+    ]
+})
