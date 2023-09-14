@@ -1,7 +1,7 @@
 // Mostra todos os bancos de dados disponíveis
 show dbs
 
-// Você pode usar este comando para selecionar um banco de dados que ainda não foi criado e ele será criado automaticamente
+// Você pode usar este comando para selecionar um banco de dados que ainda não foi criado, e ele será criado automaticamente
 use wm
 
 // Criando uma coleção com o nome 'estados'. Após a criação do banco, você pode usar 'show collections' para listar as coleções criadas.
@@ -37,7 +37,7 @@ db.estados.insert({
     nome: "Rio de Janeiro",
     sigla: "RJ",
     regiao: "Sudeste",
-    cidade: [
+    cidades: [
         {
             nome: "Niterói",
             area: 133.9,
@@ -75,3 +75,43 @@ db.estados.insert({
         }
     ]
 })
+
+// Consultas
+
+// Mostra todos os estados
+db.estados.find()
+
+// Mostra todos os estados no formato mais fácil de ver como se fosse um JSON
+db.estados.find().pretty()
+
+// Vai pegar o registro geralmente e o primeiro
+db.estados.findOne()
+
+// Pode também passar um objeto como parâmetro para o retorno
+db.estados.findOne({sigla: "RJ"})
+
+// Vai retornar a mesma coisa do de cima porque nossa base de dados só tem um registro com a sigla RJ
+db.estados.find({sigla: "RJ"})
+
+// Pode usar o pretty para melhorar a visualização
+db.estados.find({sigla: "RJ"}).pretty()
+
+// Usando o or -> ou para retornar um ou outro ou os dois parâmetros
+db.estados.find({$or: [{sigla: "RJ"}, {sigla: "AC"}]}).pretty()
+
+// Consultas se tem população dentro da tabela
+db.estados.find({populacao: {$exists: true}}).pretty()
+
+// Para não ficar retornando tudo, você pode colocar limitação na sua pesquisa
+// skip -> VAI PULAR O PRIMEIRO  
+// limit -> VAI COLOCAR O LIMITE NA PESQUISA 
+db.estados.find().skip(1).limit(2)
+
+// Pegar quantos registros tem dentro de uma coleção
+db.estados.count()
+
+// Desse jeito, você vai colocar o que você quer que retorne sem o id
+db.estados.find({sigla: "SP"}, {nome: 1, sigla: 1, _id: 0})
+
+// Desse jeito, você vai colocar o que você quer que retorne o nome das cidades sem o id
+db.estados.find({sigla: "SP"}, {"cidades.nome": 1, _id: 0})
