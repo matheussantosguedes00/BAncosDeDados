@@ -115,3 +115,140 @@ db.estados.find({sigla: "SP"}, {nome: 1, sigla: 1, _id: 0})
 
 // Desse jeito, você vai colocar o que você quer que retorne o nome das cidades sem o id
 db.estados.find({sigla: "SP"}, {"cidades.nome": 1, _id: 0})
+
+// Lembre-se de que, se você sair do mongo, precisa usar 'use' para selecionar a base do banco de dados.
+
+// Aggregate mostra o nome e o nome das cidades 
+db.estados.aggregate([
+    { $project: {nome: 1, "cidades.nome": 1, _id: 0} }
+])
+
+// Acima, utilizamos 1 estágio de agregação, agora vamos usar vários e operadores de soma
+// Na primeira linha, vamos gerar um atributo populacao e sigla
+// Na segunda linha, vamos gerar um agupamento que será o somatório de todas as cidades
+// Na terceira linha, vamos mostrar o resultado do agupamento.
+db.estados.aggregate([
+    { $project: {populacao: {$sum: "$cidades.populacao"}, sigla: 1, _id: 0} },
+    { $group: {_id: null, populacaoTotal: {$sum: "$populacao" }} },
+    { $project: { _id: 0, populacaoTotal: 1 } },
+])
+
+// Mais formas de usar a agregação
+// Vai fazer uma busca do id da cidade Sorocaba
+// Na primeira linha, usando o match, retornamos os estados de São Paulo com todas as cidades 
+// Na segunda linha, usamos o unwind para gerar documentos para cada uma das cidades com o estado correspondente.
+// Na terceira linha, usamos o match novamente para filtrar o estado e a cidade de Sorocaba.
+// Na quarta linha, usamos o project para retornar apenas o id da cidade de Sorocaba.
+db.estados.aggregate([
+    { $match: {"cidades.nome": "Sorocaba"} },
+    { $unwind: "$cidades"},
+    { $match: {"cidades.nome": "Sorocaba"} },
+    { $project: {_id: "$cidades._id"} }
+]).pretty()
+
+// Update
+// Com a sigla, indicamos o que queremos editar e com o set, especificamos o que será editado
+db.estados.update({sigla: "SP"},{$set: {populacao: 45340000}})
+
+// Nesse caso, você está fazendo um set e um update em cima de um array. Isso funcionará porque não há nenhuma cidade. No caso, seria a primeira inserção, mas para SP, não posso fazer esse set, senão substituirá todas as cidades.
+db.estados.update({sigla: "AL"},{$set: {cidades: [{nome: "Sergipe"}]}})
+
+// Esta seria a maneira certa de fazer o update para não substituir todas as cidades
+db.estados.update(
+    {sigla: "SP"},
+    {$push: {cidades: {nome: "Santos", populacao: 433966}}}
+)
+
+// Só vai retornar os estados que têm população, por isso usamos exists true
+db.estados.find({populacao: {$exists: true}}, {_id: 0, nome: 1})
+
+// Remove
+
+// Conta o número de documentos na coleção 'estados'
+db.estados.count()
+
+// Remove o documento com a sigla "AC" da coleção 'estados'
+db.estados.remove({sigla: "AC"})
+
+// Conta novamente o número de documentos após a remoção
+db.estados.count()
+
+// Encontra todos os documentos na coleção 'estados'
+db.estados.find()
+
+// Remove um documento com a propriedade 'populacao' que existe da coleção 'estados' (limite 1 documento)
+db.estados.remove({populacao: {$exists: true}}, 1)
+
+// Conta novamente o número de documentos após a remoção
+db.estados.count()
+
+// Encontra todos os documentos na coleção 'estados'
+db.estados.find()
+
+// Atualiza o documento com a sigla "RJ" para definir a propriedade 'populacao' como 16.720.000
+db.estados.update({sigla: "RJ"}, {$set: {populacao: 16720000}})
+
+// Remove todos os documentos com 'populacao' inferior a 20.000.000 da coleção 'estados'
+db.estados.remove({populacao: {$lt: 20000000}})
+
+// Encontra todos os documentos na coleção 'estados' após as operações
+db.estados.find()
+
+// Inserir empresa pelo id do estado
+
+// Adicionando Bradesco no id 
+db.empresas.insert({nome: "Bradesco", estadoId: ObjectId("5d8570683a77f90093cbd113")})
+
+// Inserir empresa pelo id da cidade
+// Adicionando Vale no id 
+db.empresas.insert({nome: "Vale", cidadeId: ObjectId("5d8570683a77f90093cbd112")})
+
+// Pesquisa para ver como está 
+db.empresas.find().pretty()
+
+// Inserir novamente o estado do Rio de Janeiro para não ficar um estado duplicado
+db.estados.insert({
+    nome: "Rio de Janeiro",
+    sigla: "RJ",
+    regiao: "Sudeste",
+    cidades: [{
+        nome: "Niterói",
+        area: 133.9,
+        populacao: 487562
+    }]
+})
+
+// Consultas novamente
+db.estados.find().pretty()
+
+// Consulta com Lookup
+
+// É feito uma agregação e uma filtragem a partir do nome "Bradesco" e por id estados 
+db.empresas.aggregate([
+    {$match: {nome: "Bradesco"}},
+    {$lookup: {
+        from: "estados",
+        localField: "estadoId",
+        foreignField: "_id",
+        as: "estado"
+    }},
+    {$unwind: "$estado"},
+]).pretty()
+
+
+// É feito uma agregação e uma filtragem a partir do nome "vale" e por id cidade 
+db.empresas.aggregate([
+    {$match: {nome: "Vale"}},
+    {$lookup: {
+        from: "estados",
+        localField: "estadoId",
+        foreignField: "cidadeId",
+        as: "estado"
+    }},
+    {$unwind: "$estado"},
+    {$unwind: "$estado.cidades"},
+    {$addFields:{mesmaCidade:{$cmp: ["$estado.cidades._id,"$cidadeId"]}}},
+{$match :{mesmaCidade:0}},
+]).pretty()
+
+{$match :{"estado.cidades._id": "$cidadeId"}},

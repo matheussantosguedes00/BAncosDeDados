@@ -1,0 +1,94 @@
+
+Comentarei linha por linha, explicando o que cada comando faz:
+
+
+
+show dbs: Este comando mostra todos os bancos de dados disponíveis.
+
+use wm: Você pode usar este comando para selecionar um banco de dados que ainda não foi criado, e ele será criado automaticamente.
+
+db.createCollection('estados'): Isso cria uma nova coleção chamada 'estados' no banco de dados selecionado.
+
+show collections: Este comando mostra todas as coleções criadas no banco de dados atual.
+
+db.createCollection('Estados'): Cria outra coleção chamada 'Estados'. Note que o MongoDB é sensível a maiúsculas e minúsculas, então coleções com nomes diferentes em letras maiúsculas e minúsculas são tratadas como coleções distintas.
+
+db.Estados.drop(): Este comando exclui a coleção 'Estados'.
+
+db.estados.insert({ nome: "Acre", sigla: "AC", regiao: "Norte" }): Insere um documento na coleção 'estados' com informações sobre o Acre.
+
+db.estados.save({ nome: "Alagoas", sigla: "AL", regiao: "Nordeste", populacao: 3322000 }): Usa o comando 'save' para atualizar ou salvar um documento existente na coleção 'estados' com informações sobre Alagoas.
+
+db.estados.find(): Mostra todos os documentos na coleção 'estados'.
+
+db.estados.find().pretty(): Mostra os documentos na coleção 'estados' em um formato JSON legível.
+
+db.estados.insert({ nome: "Rio de Janeiro", sigla: "RJ", regiao: "Sudeste", cidades: [...] }): Insere um documento na coleção 'estados' com informações sobre o Rio de Janeiro, incluindo uma subcoleção de cidades.
+
+db.help(): Mostra as operações disponíveis no MongoDB.
+
+db.estados.insert({ nome: "São Paulo", sigla: "SP", regiao: "Sudeste", cidades: [...] }): Insere um documento na coleção 'estados' com informações sobre São Paulo, incluindo várias cidades.
+
+db.estados.find(): Mostra todos os estados na coleção 'estados'.
+
+db.estados.find().pretty(): Mostra os estados na coleção 'estados' em um formato JSON legível.
+
+db.estados.findOne(): Retorna o primeiro documento na coleção 'estados'.
+
+db.estados.findOne({sigla: "RJ"}): Retorna o documento na coleção 'estados' com a sigla "RJ".
+
+db.estados.find({sigla: "RJ"}): Retorna todos os documentos na coleção 'estados' com a sigla "RJ".
+
+db.estados.find({sigla: "RJ"}).pretty(): Retorna todos os documentos na coleção 'estados' com a sigla "RJ" em formato JSON legível.
+
+db.estados.find({$or: [{sigla: "RJ"}, {sigla: "AC"}]}).pretty(): Retorna documentos na coleção 'estados' com a sigla "RJ" ou "AC".
+
+db.estados.find({populacao: {$exists: true}}).pretty(): Retorna documentos na coleção 'estados' que possuem a chave 'populacao'.
+
+db.estados.find().skip(1).limit(2): Pula o primeiro documento e limita a consulta a dois documentos na coleção 'estados'.
+
+db.estados.count(): Retorna o número de documentos na coleção 'estados'.
+
+db.estados.find({sigla: "SP"}, {nome: 1, sigla: 1, _id: 0}): Retorna documentos na coleção 'estados' com a sigla "SP", mostrando apenas os campos 'nome' e 'sigla'.
+
+db.estados.find({sigla: "SP"}, {"cidades.nome": 1, _id: 0}): Retorna documentos na coleção 'estados' com a sigla "SP", mostrando apenas os nomes das cidades.
+
+db.estados.aggregate([...]): Começa uma operação de agregação na coleção 'estados', projetando os campos 'nome' e 'cidades.nome' em cada documento.
+
+db.estados.aggregate([...]): Realiza uma agregação mais complexa que calcula a população total de todas as cidades nos estados.
+
+db.estados.aggregate([...]): Realiza uma busca e agregação específica para encontrar o ID da cidade de Sorocaba em São Paulo.
+
+db.estados.update({sigla: "SP"},{$set: {populacao: 45340000}}): Atualiza o documento com a sigla "SP" na coleção 'estados' definindo a população como 45.340.000.
+
+db.estados.update({sigla: "AL"},{$set: {cidades: [{nome: "Sergipe"}]}}): Tentativa de atualização que substituiria todas as cidades em Alagoas.
+
+db.estados.update({...}): Forma correta de adicionar uma nova cidade em Alagoas sem substituir todas as cidades existentes.
+
+db.estados.find({populacao: {$exists: true}}, {_id: 0, nome: 1}): Retorna os estados que têm a chave 'populacao' definida, mostrando apenas os nomes dos estados.
+
+db.estados.count(): Conta o número de documentos na coleção 'estados'.
+
+db.estados.remove({sigla: "AC"}): Remove o documento com a sigla "AC" da coleção 'estados'.
+
+db.estados.count(): Conta novamente o número de documentos após a remoção.
+
+db.estados.find(): Encontra todos os documentos na coleção 'estados'.
+
+db.estados.remove({populacao: {$exists: true}}, 1): Remove um documento com a propriedade 'populacao' que existe da coleção 'estados' (limite de 1 documento).
+
+db.estados.count(): Conta novamente o número de documentos após a remoção.
+
+db.estados.find(): Encontra todos os documentos na coleção 'estados' após as operações de remoção e atualização.
+
+db.empresas.insert({nome: "Bradesco", estadoId: ObjectId("5d8570683a77f90093cbd113")}): Insere uma empresa chamada "Bradesco" com uma referência ao ID de um estado.
+
+db.empresas.insert({nome: "Vale", cidadeId: ObjectId("5d8570683a77f90093cbd112")}): Insere uma empresa chamada "Vale" com uma referência ao ID de uma cidade.
+
+db.empresas.find().pretty(): Mostra os documentos na coleção 'empresas'.
+
+db.estados.insert({...}): Insere novamente o estado do Rio de Janeiro para evitar ter um estado duplicado.
+
+db.estados.find(): Consulta novamente todos os estados na coleção 'estados'.
+
+db.empresas.aggregate([...]): Realiza uma agregação para encontrar informações sobre a empresa "Bradesco" e relacioná-la com o estado correspondente usando o comando $lookup.
